@@ -11,7 +11,7 @@ function handleSideBar(value) {
 }
 
 const widthToRemove = computed(() => {
-  return isSidebarOpen.value ? 12 : 6;
+  return isSidebarOpen.value ? 14 : 6;
 });
 </script>
 
@@ -20,7 +20,7 @@ const widthToRemove = computed(() => {
     <Sidebar v-if="user" @sidebar-status="handleSideBar" />
     <router-view
       class="m-4 relative"
-      :class="[isSidebarOpen && user ? 'left-40' : 'left-16']"
+      :class="[isSidebarOpen && user ? 'left-48' : 'left-16']"
       :style="{ width: `calc(100% - ${widthToRemove}rem)` }"
     />
   </div>

@@ -11,6 +11,8 @@ const sidebarOpen = ref(true);
 const viewsLinks = ref([
   { name: 'Accueil', path: '/', icon: 'house' },
   { name: 'Utilisateurs', path: '/users', icon: 'user' },
+  { name: 'Annonces', path: '/boats', icon: 'ship' },
+  { name: 'Articles', path: '/articles', icon: 'newspaper' },
   { name: 'Paramètres', path: '/settings', icon: 'gear' },
 ]);
 
@@ -34,7 +36,8 @@ async function logout() {
 
 <template>
   <div
-    class="p-4 h-full fixed top-0 whitespace-nowrap transition-default border-r shadow-lg bg-white"
+    class="p-4 h-full fixed top-0 whitespace-nowrap border-r shadow-lg bg-white"
+    :class="{ 'w-48': sidebarOpen, 'w-16': !sidebarOpen }"
   >
     <div class="flex items-center justify-center space-x-2 mb-12">
       <h2 v-if="sidebarOpen">BedBoat</h2>
@@ -47,15 +50,31 @@ async function logout() {
         <font-awesome-icon :icon="['fas', 'chevron-right']" size="xs" />
       </div>
     </div>
-    <div class="mb-4" v-for="link in viewsLinks" :key="link.name">
+    <div class="mb-3" v-for="link in viewsLinks" :key="link.name">
       <router-link
-        class="space-x-3 p-2 transition-default hover:bg-blue-100 rounded-md"
+        class="space-x-3 px-2 py-1 transition-default hover:bg-blue-100 rounded-md block"
         :to="link.path"
       >
         <font-awesome-icon class="w-4" :icon="['fas', link.icon]" />
-        <span v-if="sidebarOpen">{{ link.name }}</span>
+        <span v-if="sidebarOpen" w-full>{{ link.name }}</span>
       </router-link>
     </div>
-    <Button text="Déconnexion" color="none" @click="logout" />
+    <div
+      class="transition-default rounded-md absolute bottom-4 left-1/2 -translate-x-1/2"
+    >
+      <Button
+        v-if="sidebarOpen"
+        text="Déconnexion"
+        color="none"
+        @click="logout"
+      />
+      <div v-else class="p-2">
+        <font-awesome-icon
+          class="w-4 cursor-pointer"
+          :icon="['fas', 'right-from-bracket']"
+          @click="logout"
+        />
+      </div>
+    </div>
   </div>
 </template>
