@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import LocomotiveScroll from 'locomotive-scroll';
 import Sidebar from './components/Sidebar.vue';
 
 const isSidebarOpen = ref(true);
+const user = JSON.parse(localStorage.getItem('user'));
 
 function handleSideBar(value) {
   isSidebarOpen.value = value;
@@ -16,10 +17,10 @@ const widthToRemove = computed(() => {
 
 <template>
   <div class="flex">
-    <Sidebar @sidebar-status="handleSideBar" />
+    <Sidebar v-if="user" @sidebar-status="handleSideBar" />
     <router-view
       class="m-4 relative"
-      :class="[isSidebarOpen ? 'left-40' : 'left-16']"
+      :class="[isSidebarOpen && user ? 'left-40' : 'left-16']"
       :style="{ width: `calc(100% - ${widthToRemove}rem)` }"
     />
   </div>

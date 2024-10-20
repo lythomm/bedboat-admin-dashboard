@@ -1,8 +1,12 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import Button from '../components/UI-Elements/Button.vue';
+import supabase from '../supabase';
 
 const emit = defineEmits(['sidebarStatus']);
 
+const router = useRouter();
 const sidebarOpen = ref(true);
 const viewsLinks = ref([
   { name: 'Accueil', path: '/', icon: 'house' },
@@ -13,6 +17,18 @@ const viewsLinks = ref([
 function handleSidebar() {
   sidebarOpen.value = !sidebarOpen.value;
   emit('sidebarStatus', sidebarOpen.value);
+}
+
+async function logout() {
+  let { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error(error);
+  } else {
+    router.push('/login');
+    window.location.reload();
+    localStorage.clear();
+  }
 }
 </script>
 
@@ -40,5 +56,6 @@ function handleSidebar() {
         <span v-if="sidebarOpen">{{ link.name }}</span>
       </router-link>
     </div>
+    <Button text="Déconnexion" color="none" @click="logout" />
   </div>
 </template>

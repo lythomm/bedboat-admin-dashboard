@@ -158,7 +158,7 @@ function updateTableView(user) {
 <template>
   <div>
     <div
-      class="mb-4 flex justify-between items-center sticky top-4 card-default"
+      class="mb-4 flex justify-between items-center sticky top-0 card-default"
     >
       <h1>Utilisateurs</h1>
       <div class="flex space-x-4 items-center">
