@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import {
   Combobox,
   ComboboxInput,
@@ -17,7 +17,9 @@ const props = defineProps({
   },
 });
 
-const people = [{ id: 0, name: '' }];
+const emit = defineEmits(['searchUser']);
+
+let people = [{ id: 0, first_name: '', last_name: '' }];
 
 let selected = ref(people[0]);
 let query = ref('');
@@ -26,16 +28,31 @@ let filteredPeople = computed(() =>
   query.value === ''
     ? people
     : people.filter((person) =>
-        person.name
+        `${person.first_name} ${person.last_name} ${person.email}`
           .toLowerCase()
           .replace(/\s+/g, '')
           .includes(query.value.toLowerCase().replace(/\s+/g, '')),
       ),
 );
 
-onMounted(() => {
-  people.push(...props.comboList);
-});
+watch(
+  () => props.comboList,
+  (newValue) => {
+    people = [{ id: 0, first_name: '', last_name: '' }];
+    people.push(...newValue);
+  },
+);
+
+watch(
+  () => selected.value,
+  (newValue) => {
+    emit('searchUser', newValue);
+  },
+);
+
+function removeSelectedUser() {
+  selected.value = people[0];
+}
 </script>
 
 <template>
@@ -47,8 +64,16 @@ onMounted(() => {
         >
           <ComboboxInput
             class="w-full py-2 pl-3 text-sm text-gray-900 focus:ring-0"
-            :displayValue="(person) => person.name"
+            :displayValue="
+              (person) => `${person.first_name} ${person.last_name}`
+            "
             @change="query = $event.target.value"
+          />
+          <font-awesome-icon
+            v-if="selected?.id !== 0"
+            class="absolute inset-y-0 top-1/2 -translate-y-1/2 right-0 flex items-center pr-2 cursor-pointer"
+            :icon="['fas', 'xmark']"
+            @click="removeSelectedUser"
           />
         </div>
         <TransitionRoot
@@ -85,7 +110,7 @@ onMounted(() => {
                   class="block truncate"
                   :class="{ 'font-medium': selected, 'font-normal': !selected }"
                 >
-                  {{ person.name }}
+                  {{ person.first_name }} {{ person.last_name }}
                 </span>
                 <span
                   v-if="selected"

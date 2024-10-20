@@ -36,15 +36,11 @@ function resetCurrentUser() {
   };
 }
 
-onMounted(async () => {
+onMounted(() => {
   getUsers();
 });
 
 const tableHeaders = ref([
-  {
-    value: 'id',
-    text: 'ID',
-  },
   {
     value: 'first_name',
     text: 'Prénom',
@@ -114,16 +110,14 @@ function viewUser(user) {
 
 async function addOrUpdateUser(action) {
   if (action === 'add') {
-    const { data, error } = await supabase
-      .from('users') // Remplace 'user' par le nom de ta table si nécessaire
-      .insert([
-        {
-          first_name: currentUser.first_name,
-          last_name: currentUser.last_name,
-          email: currentUser.email,
-          iban: currentUser.iban,
-        },
-      ]);
+    const { data, error } = await supabase.from('users').insert([
+      {
+        first_name: currentUser.first_name,
+        last_name: currentUser.last_name,
+        email: currentUser.email,
+        iban: currentUser.iban,
+      },
+    ]);
 
     if (error) {
       console.error("Erreur lors de l'ajout de l'utilisateur :", error.message);
@@ -151,15 +145,25 @@ async function addOrUpdateUser(action) {
   getUsers();
   userModal.value.setIsOpen(false);
 }
+
+function updateTableView(user) {
+  if (user.first_name === '') {
+    getUsers();
+  } else {
+    users.value = users.value.filter((u) => u.id === user.id);
+  }
+}
 </script>
 
 <template>
-  <div class="card-default w-full">
-    <div class="mb-4 flex justify-between items-center">
+  <div>
+    <div
+      class="mb-4 flex justify-between items-center sticky top-4 card-default"
+    >
       <h1>Utilisateurs</h1>
       <div class="flex space-x-4 items-center">
         <div class="flex space-x-2 items-center">
-          <Combobox />
+          <Combobox :combo-list="users" @search-user="updateTableView" />
           <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
         </div>
         <font-awesome-icon :icon="['fas', 'filter']" />
@@ -172,8 +176,8 @@ async function addOrUpdateUser(action) {
         />
       </div>
     </div>
-    <div>
-      <table class="whitespace-nowrap overflow-x-auto inline-block w-full">
+    <div class="card-default">
+      <table class="whitespace-nowrap overflow-x-auto w-full">
         <thead>
           <tr>
             <th
@@ -191,15 +195,12 @@ async function addOrUpdateUser(action) {
         </thead>
         <tbody>
           <tr
-            class="hover:bg-blue-50 hover:cursor-pointer group"
+            class="hover:bg-blue-50 rounded-xl hover:cursor-pointer group"
             v-for="user in users"
             :key="user.id"
             @click="viewUser(user)"
           >
-            <td class="py-2 pl-2">
-              {{ user.id }}
-            </td>
-            <td>{{ user.first_name }}</td>
+            <td class="py-2 pl-2">{{ user.first_name }}</td>
             <td>{{ user.last_name }}</td>
             <td>{{ user.email }}</td>
             <td>{{ formatDate(user.created_at) }}</td>
@@ -228,20 +229,6 @@ async function addOrUpdateUser(action) {
         <div class="mt-2 grid grid-cols-2 gap-4">
           <div>
             <label
-              for="last_name"
-              class="block text-sm font-medium text-gray-700"
-            >
-              Nom
-            </label>
-            <input
-              type="text"
-              name="last_name"
-              id="last_name"
-              v-model="currentUser.last_name"
-            />
-          </div>
-          <div>
-            <label
               for="first_name"
               class="block text-sm font-medium text-gray-700"
             >
@@ -252,6 +239,20 @@ async function addOrUpdateUser(action) {
               name="first_name"
               id="first_name"
               v-model="currentUser.first_name"
+            />
+          </div>
+          <div>
+            <label
+              for="last_name"
+              class="block text-sm font-medium text-gray-700"
+            >
+              Nom
+            </label>
+            <input
+              type="text"
+              name="last_name"
+              id="last_name"
+              v-model="currentUser.last_name"
             />
           </div>
           <div>
@@ -302,6 +303,9 @@ async function addOrUpdateUser(action) {
             />
             <Button
               :text="currentUser.id ? 'Modifier' : 'Ajouter'"
+              @keydown.enter="
+                addOrUpdateUser(currentUser.id ? 'update' : 'add')
+              "
               @click="addOrUpdateUser(currentUser.id ? 'update' : 'add')"
             />
           </div>

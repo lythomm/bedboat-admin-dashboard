@@ -5,8 +5,6 @@ import Sidebar from './components/Sidebar.vue';
 
 const isSidebarOpen = ref(true);
 
-const locomotiveScroll = new LocomotiveScroll();
-
 function handleSideBar(value) {
   isSidebarOpen.value = value;
 }

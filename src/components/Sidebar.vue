@@ -32,7 +32,10 @@ function handleSidebar() {
       </div>
     </div>
     <div class="mb-4" v-for="link in viewsLinks" :key="link.name">
-      <router-link class="space-x-3 p-2 transition-default" :to="link.path">
+      <router-link
+        class="space-x-3 p-2 transition-default hover:bg-blue-100 rounded-md"
+        :to="link.path"
+      >
         <font-awesome-icon class="w-4" :icon="['fas', link.icon]" />
         <span v-if="sidebarOpen">{{ link.name }}</span>
       </router-link>
